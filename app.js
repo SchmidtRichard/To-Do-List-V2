@@ -2,7 +2,12 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
-const date = require(__dirname + "/date.js");
+
+//Require Mongoose package that have just been installed
+const mongoose = require("mongoose");
+
+//Code from before mongoDB creation - also delete the date.js file from the project
+//const date = require(__dirname + "/date.js");
 
 const app = express();
 
@@ -17,12 +22,68 @@ app.use(express.static("public"));
 // const items = ["Buy Food", "Cook Food", "Eat Food"];
 // const workItems = [];
 
+
+//Create a new DB inside mongoDB
+//Connect to the URL where mongoDB is hosted locally (usually localhost:27017)
+//Call the DB todolistDB
+//add useNewUrlParser: true - to avoid the deprecation warning sign
+mongoose.connect("mongodb://localhost:27017/todolistDB", {
+  useNewUrlParser: true
+});
+
+
+
+
+
+
+
+//Create the itemsSchema schema for the mongoDB
+const itemsSchema = {
+  name: String
+};
+
+//Create a new mongoose model based on the itemsSchema
+//The collection will be called items - so we use the singular version of it for creating the model
+const Item = mongoose.model("Item", itemsSchema);
+
+//Create 3 new documents using the Item mongoose model
+const item1 = new Item({
+  name: "Welcome to your to-do-list!"
+});
+
+const item2 = new Item({
+  name: "Hit the + button to add a new item."
+});
+
+const item3 = new Item({
+  name: "<-- Hit this to delete an item."
+});
+
+//Add all the new created documents above into an array called
+const defaultItems = [item1, item2, item3];
+
+
+//Use mongoose's method insertMany to insert all the documents into the items collection
+Item.insertMany(defaultItems, function(err) {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log("All documents inserted to DB using insertMany method!");
+  }
+});
+
+
+
 app.get("/", function(req, res) {
 
-  const day = date.getDate();
+  //Code from before mongoDB creation - also delete the date.js file from the project
+  //const day = date.getDate();
 
+
+  //Render the default list with a title called Today
+  //Pass the items from the items collection (need some default items: )
   res.render("list", {
-    listTitle: day,
+    listTitle: "Today",
     newListItems: items
   });
 
