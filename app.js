@@ -42,7 +42,7 @@ const itemsSchema = {
   name: String
 };
 
-//Create a new mongoose model based on the itemsSchema
+//Create a new mongoose model (Item) based on the itemsSchema
 //The collection will be called items - so we use the singular version of it for creating the model
 const Item = mongoose.model("Item", itemsSchema);
 
@@ -63,31 +63,57 @@ const item3 = new Item({
 const defaultItems = [item1, item2, item3];
 
 
+
 //Use mongoose's method insertMany to insert all the documents into the items collection
-Item.insertMany(defaultItems, function(err) {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log("All documents inserted to DB using insertMany method!");
-  }
-});
+// Item.insertMany(defaultItems, function(err) {
+//   if (err) {
+//     console.log(err);
+//   } else {
+//     console.log("All documents inserted to DB using insertMany method!");
+//   }
+// });
+
 
 
 
 app.get("/", function(req, res) {
 
-  //Code from before mongoDB creation - also delete the date.js file from the project
-  //const day = date.getDate();
+  //Check if the items collection is empty, if empty insert defaultItems, otherwise do not insert the defaultItems
 
 
-  //Render the default list with a title called Today
-  //Pass the items from the items collection (need some default items: )
-  res.render("list", {
-    listTitle: "Today",
-    newListItems: items
+
+  //Call mongoose find method
+  //foundItems will contain what has been found inside the Items collections using the find method
+  Item.find({}, function(err, foundItems) {
+    //Check if the array/collection of items is empty
+    if (foundItems.length === 0) {
+      // Use mongoose's method insertMany to insert all the documents into the items collection
+      Item.insertMany(defaultItems, function(err) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("All documents inserted to DB using insertMany method!");
+        }
+      });
+
+      //Redirect back to the rote route in order to render the new items over to the list.ejs
+      res.redirect("/");
+
+    } else {
+      //Render the default list with a title called Today
+      //Pass the items from the items collection
+      res.render("list", {
+        listTitle: "Today",
+        newListItems: foundItems
+      });
+    }
   });
 
+  //Code from before mongoDB creation - also delete the date.js file from the project
+  //const day = date.getDate();
 });
+
+
 
 app.post("/", function(req, res) {
 

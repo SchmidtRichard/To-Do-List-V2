@@ -5,12 +5,31 @@
   </div>
 
   <div class="box">
-    <% for (let i=0; i<newListItems.length; i++) { %>
+
+
+    <!-- Replace the for loop on the bottom for a forEach loop -->
+    <% newListItems.forEach(function(item){ %>
       <div class="item">
         <input type="checkbox">
-        <p><%=  newListItems[i]  %></p>
+
+        <!-- newListItems[i].name instead of adding the whole documents collection we can add only the name -->
+        <p><%= item.name %></p>
       </div>
-      <% } %>
+    <% }); %>
+
+
+
+
+ <%/* for (let i=0; i<newListItems.length; i++) { */%>
+    <!--  <div class="item">
+        <input type="checkbox">
+
+        <!-- newListItems[i].name instead of adding the whole documents collection we can add only the name -->
+        <p><%=/*  newListItems[i].name  */%></p>
+      <!-- </div> -->
+      <%/* } */%>
+
+
 
       <form class="item" action="/" method="post">
         <input type="text" name="newItem" placeholder="New Item" autocomplete="off">
