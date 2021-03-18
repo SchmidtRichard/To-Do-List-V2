@@ -117,15 +117,29 @@ app.get("/", function(req, res) {
 
 app.post("/", function(req, res) {
 
-  const item = req.body.newItem;
+  const itemName = req.body.newItem;
 
-  if (req.body.list === "Work") {
-    workItems.push(item);
-    res.redirect("/work");
-  } else {
-    items.push(item);
-    res.redirect("/");
-  }
+  //Create a new item document based on the model in mongoDB
+  const item = new Item({
+    name: itemName
+  });
+
+  //mogoose shortcute to save the new item
+  item.save();
+
+  //Refresh the page
+  res.redirect("/");
+
+
+
+  //Previous code
+  // if (req.body.list === "Work") {
+  //   workItems.push(item);
+  //   res.redirect("/work");
+  // } else {
+  //   items.push(item);
+  //   res.redirect("/");
+  // }
 });
 
 app.get("/work", function(req, res) {
