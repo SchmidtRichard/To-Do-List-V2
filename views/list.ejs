@@ -9,12 +9,16 @@
 
     <!-- Replace the for loop on the bottom for a forEach loop -->
     <% newListItems.forEach(function(item){ %>
-      <div class="item">
-        <input type="checkbox">
 
-        <!-- newListItems[i].name instead of adding the whole documents collection we can add only the name -->
-        <p><%= item.name %></p>
-      </div>
+      <!-- Form to send data -->
+      <form action="/delete" method="post">
+        <div class="item">
+          <input type="checkbox" name="checkbox" value="<%=item._id%>" onChange="this.form.submit()">
+
+          <!-- newListItems[i].name instead of adding the whole documents collection we can add only the name -->
+          <p><%= item.name %></p>
+        </div>
+      </form>
     <% }); %>
 
 

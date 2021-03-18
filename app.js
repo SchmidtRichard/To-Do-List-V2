@@ -81,7 +81,6 @@ app.get("/", function(req, res) {
   //Check if the items collection is empty, if empty insert defaultItems, otherwise do not insert the defaultItems
 
 
-
   //Call mongoose find method
   //foundItems will contain what has been found inside the Items collections using the find method
   Item.find({}, function(err, foundItems) {
@@ -141,6 +140,25 @@ app.post("/", function(req, res) {
   //   res.redirect("/");
   // }
 });
+
+//New route to delete what has been checked in the check box
+app.post("/delete", function(req, res) {
+  const checkedItemId = req.body.checkbox;
+
+  Item.findByIdAndRemove(checkedItemId, function(err) {
+    if (!err) {
+      console.log("Successfully deleted checked item");
+
+      //Refresh the page to display the changes
+      res.redirect("/");
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+
+
 
 app.get("/work", function(req, res) {
   res.render("list", {
