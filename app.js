@@ -64,6 +64,17 @@ const defaultItems = [item1, item2, item3];
 
 
 
+//Create new schema - each new list we create the list will have a name and an array of item documents
+const listSchema = {
+  name: String,
+  items: [itemsSchema]
+};
+
+//Create the mongoose model
+const List = mongoose.model("List", listSchema);
+
+
+
 //Use mongoose's method insertMany to insert all the documents into the items collection
 // Item.insertMany(defaultItems, function(err) {
 //   if (err) {
@@ -108,8 +119,48 @@ app.get("/", function(req, res) {
     }
   });
 
+
+
+  //Create express route parameter
+  app.get("/:customListName", function(req, res) {
+
+    const customListName = req.params.customListName;
+
+    //Mongoose findOne method - find a list with the same name the user is trying to access
+    List.findOne({
+      name: customListName
+    }, function(err, foundList) {
+      if (!err) {
+        if (!foundList) {
+
+          //Create a new list
+          const list = new List({
+            name: customListName,
+            items: defaultItems
+          });
+
+          //Save the data into the list collection
+          list.save();
+
+          //Redirect to the current route
+          res.redirect("/" + customListName);
+        } else {
+          //Show an existing list
+          res.render("list", {
+            listTitle: foundList.name,
+            newListItems: foundList.items
+          });
+
+          console.log("Exists!");
+        }
+      }
+    });
+  });
+
+
   //Code from before mongoDB creation - also delete the date.js file from the project
   //const day = date.getDate();
+
 });
 
 
@@ -141,6 +192,14 @@ app.post("/", function(req, res) {
   // }
 });
 
+
+
+
+
+
+
+
+
 //New route to delete what has been checked in the check box
 app.post("/delete", function(req, res) {
   const checkedItemId = req.body.checkbox;
@@ -160,16 +219,18 @@ app.post("/delete", function(req, res) {
 
 
 
-app.get("/work", function(req, res) {
-  res.render("list", {
-    listTitle: "Work List",
-    newListItems: workItems
-  });
-});
+
+
+
+
 
 app.get("/about", function(req, res) {
   res.render("about");
 });
+
+
+
+
 
 app.listen(3000, function() {
   console.log("Server started on port 3000");
