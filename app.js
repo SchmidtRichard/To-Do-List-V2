@@ -169,16 +169,32 @@ app.post("/", function(req, res) {
 
   const itemName = req.body.newItem;
 
+  //Get the list name from list.ejs to know what list we are trying to access
+  const listName = req.body.list;
+
   //Create a new item document based on the model in mongoDB
   const item = new Item({
     name: itemName
   });
 
-  //mogoose shortcute to save the new item
-  item.save();
+  if (listName === "Today") {
+    //mongoose shortcute to save the new item
+    item.save();
 
-  //Refresh the page
-  res.redirect("/");
+    //Redirect to home route
+    res.redirect("/");
+
+    //Find the custom list if it is not the default list (Today-home) and then add the new item to the items in the list and redirect back to the list-route wanted
+  } else {
+    List.findOne({
+      name: listName
+    }, function(err, foundList) {
+      foundList.items.push(item);
+      foundList.save();
+      res.redirect("/" + listName);
+    });
+  }
+
 
 
 
@@ -191,10 +207,6 @@ app.post("/", function(req, res) {
   //   res.redirect("/");
   // }
 });
-
-
-
-
 
 
 
