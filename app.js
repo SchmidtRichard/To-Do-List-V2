@@ -6,6 +6,9 @@ const bodyParser = require("body-parser");
 //Require Mongoose package that have just been installed
 const mongoose = require("mongoose");
 
+//Add lodash to the app
+const _ = require("lodash");
+
 //Code from before mongoDB creation - also delete the date.js file from the project
 //const date = require(__dirname + "/date.js");
 
@@ -120,11 +123,10 @@ app.get("/", function(req, res) {
   });
 
 
-
   //Create express route parameter
   app.get("/:customListName", function(req, res) {
 
-    const customListName = req.params.customListName;
+    const customListName = _.capitalize(req.params.customListName);
 
     //Mongoose findOne method - find a list with the same name the user is trying to access
     List.findOne({
@@ -164,7 +166,6 @@ app.get("/", function(req, res) {
 });
 
 
-
 app.post("/", function(req, res) {
 
   const itemName = req.body.newItem;
@@ -195,9 +196,6 @@ app.post("/", function(req, res) {
     });
   }
 
-
-
-
   //Previous code
   // if (req.body.list === "Work") {
   //   workItems.push(item);
@@ -209,39 +207,47 @@ app.post("/", function(req, res) {
 });
 
 
-
-
-
 //New route to delete what has been checked in the check box
 app.post("/delete", function(req, res) {
   const checkedItemId = req.body.checkbox;
 
-  Item.findByIdAndRemove(checkedItemId, function(err) {
-    if (!err) {
-      console.log("Successfully deleted checked item");
+  //Check the value of the list name - list.ejs
+  const listName = req.body.listName;
 
-      //Refresh the page to display the changes
-      res.redirect("/");
-    } else {
-      console.log(err);
-    }
-  });
+  //Check if the item to be deleted is from the default is list or from a custom list
+  if (listName === "Today") {
+    Item.findByIdAndRemove(checkedItemId, function(err) {
+      if (!err) {
+        console.log("Successfully deleted checked item");
+
+        //Refresh the page to display the changes
+        res.redirect("/");
+      } else {
+        console.log(err);
+      }
+    });
+    //If the item to be deleted is from a custom list we find what list it is and the id of the item by searching the items array
+  } else {
+    List.findOneAndUpdate({
+      name: listName
+    }, {
+      $pull: {
+        items: {
+          _id: checkedItemId
+        }
+      }
+    }, function(err, foundList) {
+      if (!err) {
+        res.redirect("/" + listName);
+      }
+    });
+  }
 });
-
-
-
-
-
-
-
 
 
 app.get("/about", function(req, res) {
   res.render("about");
 });
-
-
-
 
 
 app.listen(3000, function() {

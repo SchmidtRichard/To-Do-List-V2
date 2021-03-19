@@ -18,6 +18,10 @@
           <!-- newListItems[i].name instead of adding the whole documents collection we can add only the name -->
           <p><%= item.name %></p>
         </div>
+
+        <!-- Get the value of the list name - list.ejs-->
+        <input type="hidden" name="listName" value="<%= listTitle %>"></input>
+
       </form>
     <% }); %>
 
